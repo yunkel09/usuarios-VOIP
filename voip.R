@@ -19,7 +19,7 @@
       myurl <- 'http://talent.com.gt/IntroR/UsersVoIP.csv'
       var_1 <- as.tibble(fread(input = myurl,
                                data.table = FALSE))
-      
+      save('voip_users_raw_df.rda')
       load('voip_users_raw_df.rda')
       
 ##  ............................................................................
@@ -105,50 +105,44 @@
       #' por lo que utilizamos n_distinct.  La diferencia de ese registros son Q 180 en el revenue
       #' total. 
       
-      
-            
-            # usuarios VOIP
-            var_11a <-  var_9 %>%
-                        select(revenue_outgoing, msisdn_dd, uservoip_max) %>%
-                        group_by(uservoip_max) %>%
-                        summarise(arpu_uservoip = sum(revenue_outgoing) / n_distinct(msisdn_dd)) %>%
-                        arrange(desc(arpu_uservoip)) %>%
-                        mutate_at('arpu_uservoip', round, digits = 2)
+      # usuarios VOIP
+      var_11a <-  var_9 %>%
+                  select(revenue_outgoing, msisdn_dd, uservoip_max) %>%
+                  group_by(uservoip_max) %>%
+                  summarise(arpu_uservoip = sum(revenue_outgoing) / n_distinct(msisdn_dd)) %>%
+                  arrange(desc(arpu_uservoip)) %>%
+                  mutate_at('arpu_uservoip', round, digits = 2)
                               
-            # usuarios whatsapp      
-            var_11b <-  var_9 %>%
-                        select(revenue_outgoing, msisdn_dd, whatsappvoip_max) %>%
-                        group_by(whatsappvoip_max) %>%
-                        summarise(arpu_whatsappvoip = sum(revenue_outgoing) / n_distinct(msisdn_dd)) %>%
-                        arrange(desc(arpu_whatsappvoip)) %>%
-                        mutate_at('arpu_whatsappvoip', round, digits = 2)
+      # usuarios whatsapp      
+      var_11b <-  var_9 %>%
+                  select(revenue_outgoing, msisdn_dd, whatsappvoip_max) %>%
+                  group_by(whatsappvoip_max) %>%
+                  summarise(arpu_whatsappvoip = sum(revenue_outgoing) / n_distinct(msisdn_dd)) %>%
+                  arrange(desc(arpu_whatsappvoip)) %>%
+                  mutate_at('arpu_whatsappvoip', round, digits = 2)
                   
-            # usuarios con trafico de datos, pero sin trafico VOIP
-            # datauser_novoip
+      # usuarios con trafico de datos, pero sin trafico VOIP
+      # datauser_novoip
             
-            
-            
-            var_11c <-  var_9 %>%
-                        select(uservoip_max, msisdn_dd, mb_totales, voip_trffc_sum, revenue_outgoing) %>%
-                        group_by(uservoip_max) %>%
-                        filter(mb_totales > 0,
-                               voip_trffc_sum == 0) %>%
-                        # 
-                  summarise(arpu_datauser_novoip = sum(revenu))
-                        mutate_at('mb_totales', round, digits = 2) %>%
-                        arrange(desc(mb_totales))
-            
-            
-            
-            
-            # usuarios sin trafico de datos
-            var_11d <-  var_9 %>%
-                        filter(mb_totales == 0)
+      var_11c <-  var_9 %>%
+                  select(uservoip_max, msisdn_dd, mb_totales, voip_trffc_sum, revenue_outgoing) %>%
+                  filter(mb_totales > 0,
+                        voip_trffc_sum == 0) %>%
+                  summarise(arpu_datauser_novoip = round(sum(revenue_outgoing) / n_distinct(msisdn_dd), 2))
                         
             
-            # usuarios con trafico entrante internacional      
-            var_11e <-  var_9 %>%
-                        filter(user_inc_intl > 0)
+            
+            
+      # usuarios sin trafico de datos
+      var_11d <-  var_9 %>%
+                  filter(mb_totales == 0) %>%
+                  summarise(arpu_users_no_data_tffc = round(sum(revenue_outgoing) / n_distinct(msisdn_dd), 2))
+                        
+            
+      # usuarios con trafico entrante internacional      
+      var_11e <-  var_9 %>%
+                  filter(user_inc_intl > 0)
+                        
 
       # 12. ARPU outgoing por tipo de dispositivo
       var_12 <-   var_9 %>%
