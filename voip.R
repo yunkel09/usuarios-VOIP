@@ -5,13 +5,11 @@
 ##  ............................................................................
 ##  Step 0: Packages and options                                            ####
 
-      pkgs <- c('tidyverse',
-                'data.table',     # fread 
-                'scales',         # percent
-                'magrittr',       # %<>%
-                'stringr')        # str_replace_all
+      list.of.packages <- c('data.table', 'tidyverse', 'magrittr', 'scales')
+      new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+      if(length(new.packages)) install.packages(new.packages)
 
-      lapply(pkgs, library, character.only = TRUE)
+      lapply(c(list.of.packages, new.packages), library, character.only = TRUE, quietly = TRUE)
       options(scipen = 999)
       
 ##  ............................................................................
@@ -79,7 +77,8 @@
                          revenue_proportion = percent(revenue / sum(revenue)),
                          revenue_inf_proportion = percent(revenue_broadband  / sum(revenue_broadband ))) %>%
                   select(-revenue) %>%
-                  arrange(desc(users))
+                  arrange(desc(users)) %>%
+                  do(.[refcols])
       
       var_7 <-    var_7[refcols]                # reordenar columnas
                   
