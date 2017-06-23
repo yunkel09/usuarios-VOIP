@@ -5,12 +5,16 @@
 ##  ............................................................................
 ##  Step 0: Packages and options                                            ####
 
-      list.of.packages <- c('data.table', 'tidyverse', 'magrittr', 'scales')
-      new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+      list.of.packages <- c('data.table',  # funcion 'fread' lectura mas rapida que read_csv de readr
+                            'dplyr',
+                            'magrittr',    # compound assignment pipe operator %<>%   
+                            'scales')     # percent_format
+      
+      new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[, "Package"])]
       if(length(new.packages)) install.packages(new.packages)
 
       lapply(c(list.of.packages, new.packages), library, character.only = TRUE, quietly = TRUE)
-      options(scipen = 999)
+      options(scipen = 999)                # Evitar notacion cientifica
       
 ##  ............................................................................
 ##  Step 1: Load Dataset                                                   ####
@@ -18,6 +22,8 @@
       myurl <- 'http://talent.com.gt/IntroR/UsersVoIP.csv'
       var_1 <- as.tibble(fread(input = myurl,
                                data.table = FALSE))
+      
+      # cargar rda una vez leido.
       save('voip_users_raw_df.rda')
       load('voip_users_raw_df.rda')
       
