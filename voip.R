@@ -6,9 +6,10 @@
 ##  Step 0: Packages and options                                            ####
 
       list.of.packages <- c('data.table',  # funcion 'fread' lectura mas rapida que read_csv de readr
-                            'dplyr',
-                            'magrittr',    # compound assignment pipe operator %<>%   
-                            'scales')      # percent_format
+                            'tidyverse',
+                            'magrittr',    # %>%, %<>%, %$%  
+                            'scales',      # percent_format
+                            'gdata')       # reorder.factor function
       new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[, "Package"])]
       if(length(new.packages)) install.packages(new.packages)
       inst <- lapply(c(list.of.packages, new.packages), library, character.only = TRUE, quietly = TRUE)
@@ -46,7 +47,23 @@
       # 3. Cantidad de usuarios por categoria
       var_3       <-    var_1 %>%
                         count(cst_type, sort = TRUE) %>%
-                        rename(users = n)
+                        rename(users = n) %>%
+                        mutate_at('cst_type', as.factor) %>%
+                        mutate(pos = cumsum(users)- (0.5 * users))
+      
+            # 3.1 optional plotting
+            order_type <- var_3 %$% reorder.factor(cst_type, users, function(x) sum(x))
+            
+                  ggplot(var_3, aes(x = order_type, y = users)) +
+                  geom_bar(stat = "identity", col = "black", fill = "steelblue") +
+                  ylim(0, max(var_3$users) * 1.1) +
+                  xlab("categorias") + ylab("cantidad usuarios") + ggtitle("Pareto de Usuarios") +
+                  coord_flip() +
+                        geom_text(aes(label = users), size = 3, hjust = -0.2) +
+                        theme_bw() +
+                        theme(legend.position = "top", legend.title = element_blank(),panel.grid.major.y = element_blank()) +
+                        theme(axis.text.x = element_text(size = 8)) +
+                        theme(legend.key = element_rect(colour = "black"))
       
       # 4. Porcentaje de usuarios por categoria
       var_4       <-    grp.v1 %>%
@@ -55,8 +72,7 @@
                         arrange(desc(as.numeric(sub("%", "", user_proportion))))
       
       # 5. Porcentaje de revenue por categoria de usuario
-      var_5       <-    var_1 %>%
-                        group_by(cst_type) %>%
+      var_5       <-    grp.v1 %>%
                         summarise(revenue = sum(revenue_total)) %>%
                         mutate(revenue_proportion = percent(revenue / sum(revenue))) %>%
                   
@@ -64,18 +80,17 @@
                   # arrange(desc(as.numeric(sub("%", "", revenue_proportion)))) 
       
       # 6. Porcentaje de revenue broadband que por categoria de usuario
-      var_6       <-    var_1 %>%
-                        group_by(cst_type) %>%
+      var_6       <-    grp.v1 %>%
                         summarise(revenue = sum(revenue_inf)) %>%
                         mutate(revenue_inf_proportion = percent(revenue / sum(revenue)))%>%
                         arrange(desc(as.numeric(sub("%", "", revenue_inf_proportion))))
       
       # 7. Construir un df con los puntos anteriores
       refcols     <-    c('cst_type',
-                         'users',                    # cantidad de usuarios
-                         'users_proportion',
-                         'revenue_proportion',
-                         'revenue_inf_proportion')
+                          'users',                    # cantidad de usuarios
+                          'users_proportion',
+                          'revenue_proportion',
+                          'revenue_inf_proportion')
       
       var_7       <-    var_1 %>%
                         select(cst_type, revenue_total, revenue_inf) %>%
