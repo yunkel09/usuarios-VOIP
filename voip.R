@@ -7,9 +7,10 @@
 
       list.of.packages <- c('data.table',  # funcion 'fread' lectura mas rapida que read_csv de readr
                             'tidyverse',
-                            'magrittr',    # %>%, %<>%, %$%  
+                            'magrittr',    # operators like (%>%, %<>%, %$%)
                             'scales',      # percent_format
                             'gdata')       # reorder.factor function
+      
       new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[, "Package"])]
       if(length(new.packages)) install.packages(new.packages)
       inst <- lapply(c(list.of.packages, new.packages), library, character.only = TRUE, quietly = TRUE)
@@ -17,8 +18,19 @@
       # definir opciones      
       options(scipen = 999)                # Evitar notacion cientifica
       
+
 ##  ............................................................................
-##  Step 1: Load Dataset                                                    ####
+##  Step 1: Themes                                                          ####
+
+      mytheme <- theme(panel.background = element_blank(),
+                       panel.grid.major = element_blank(),
+                       panel.grid.minor = element_blank(),
+                       axis.text.x = element_text(size = 8),
+                       axis.title.y = element_blank(),
+                       panel.border = element_rect(colour = "black", fill = NA))
+      
+##  ............................................................................
+##  Step 2: Load Dataset                                                    ####
 
       myurl <- 'http://talent.com.gt/IntroR/UsersVoIP.csv'
       var_1 <- as.tibble(fread(input = myurl,
@@ -28,8 +40,9 @@
       save('voip_users_raw_df.rda')
       load('voip_users_raw_df.rda')
       
+            
 ##  ............................................................................
-##  Step 2: Data Carpentry                                                  ####
+##  Step 3: Data Carpentry                                                  ####
 
       colnames(var_1) %<>% tolower
       
@@ -41,30 +54,29 @@
       grp.v1      <- var_1 %>% group_by(cst_type)
       
       
-      # 2. Registros totales
+      # 3.2 Registros totales
       var_2       <-    nrow(var_1)
       
-      # 3. Cantidad de usuarios por categoria
+      # 3.3 Cantidad de usuarios por categoria
       var_3       <-    var_1 %>%
                         count(cst_type, sort = TRUE) %>%
                         rename(users = n) %>%
-                        mutate_at('cst_type', as.factor) %>%
-                        mutate(pos = cumsum(users)- (0.5 * users))
-      
-            # 3.1 optional plotting
-            order_type <- var_3 %$% reorder.factor(cst_type, users, function(x) sum(x))
+                        mutate_at('cst_type', as.factor)
+                        
+            # 3.3.1 optional plotting
             
-                  ggplot(var_3, aes(x = order_type, y = users)) +
-                  geom_bar(stat = "identity", col = "black", fill = "steelblue") +
-                  ylim(0, max(var_3$users) * 1.1) +
-                  xlab("categorias") + ylab("cantidad usuarios") + ggtitle("Pareto de Usuarios") +
-                  coord_flip() +
-                        geom_text(aes(label = users), size = 3, hjust = -0.2) +
-                        theme_bw() +
-                        theme(legend.position = "top", legend.title = element_blank(),panel.grid.major.y = element_blank()) +
-                        theme(axis.text.x = element_text(size = 8)) +
-                        theme(legend.key = element_rect(colour = "black"))
-      
+                  # reordenar factores
+                  type_1 <- var_3 %$% reorder.factor(cst_type, users, function(x) sum(x))
+            
+                  # graficar
+                   ggplot(var_3, aes(x = type_1, y = users)) +
+                    geom_bar(stat = "identity", col = "black", fill = "steelblue") +
+                    xlab("categorias") + ylab("cantidad usuarios") + ggtitle("Pareto de Usuarios") +
+                    scale_y_continuous(limits = c(0, (max(var_3$users) * 1.1)), labels = comma) +
+                    coord_flip() +
+                    geom_text(aes(label = comma(users)), size = 3, hjust = -0.2) +
+                    mytheme
+                  
       # 4. Porcentaje de usuarios por categoria
       var_4       <-    grp.v1 %>%
                         summarise(users = n()) %>%
