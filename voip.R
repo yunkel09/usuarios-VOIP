@@ -77,11 +77,26 @@
                     geom_text(aes(label = comma(users)), size = 3, hjust = -0.2) +
                     mytheme
                   
-      # 4. Porcentaje de usuarios por categoria
+      # 3.4 Porcentaje de usuarios por categoria
       var_4       <-    grp.v1 %>%
                         summarise(users = n()) %>%
-                        mutate(user_proportion = percent(users / sum(users))) %>%
-                        arrange(desc(as.numeric(sub("%", "", user_proportion))))
+                        mutate(user_proportion = users / sum(users)) %>%
+                        arrange(desc(user_proportion))
+      
+                  # 3.4.1 optional plotting
+            
+                  # reordenar factores
+                  type_2 <- var_4 %$% reorder.factor(cst_type, user_proportion, function(x) sum(x))
+            
+                  # graficar
+                  ggplot(var_4, aes(x = type_2, y = user_proportion)) +
+                  geom_bar(stat = "identity", col = "black", fill = "steelblue") +
+                  xlab("categorias") + ylab("cantidad usuarios") + ggtitle("PORCENTAJES") +
+                  scale_y_continuous(limits = c(0, (max(var_4$user_proportion) * 1.1)), labels = percent) +
+                  coord_flip() +
+                  geom_text(aes(label = percent(user_proportion)), size = 3, hjust = -0.2) +
+                  mytheme
+            
       
       # 5. Porcentaje de revenue por categoria de usuario
       var_5       <-    grp.v1 %>%
