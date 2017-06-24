@@ -63,8 +63,6 @@
                         rename(users = n) %>%
                         mutate_at('cst_type', as.factor)
                         
-                        # 3.3.1 optional plotting
-                  
                         # reordenar factores
                         type_1 <- var_3 %$% reorder.factor(cst_type, users, function(x) sum(x))
                   
@@ -83,8 +81,6 @@
                         mutate(user_proportion = users / sum(users)) %>%
                         arrange(desc(user_proportion))
       
-                        # 3.4.1 optional plotting
-                  
                         # reordenar factores
                         type_2 <- var_4 %$% reorder.factor(cst_type, user_proportion, function(x) sum(x))
                   
@@ -104,8 +100,6 @@
                         mutate(revenue_proportion = revenue / sum(revenue)) %>%
                         arrange(desc(revenue_proportion))
 
-                        # 3.5.1 optional plotting
-                        
                         # reordenar factores
                         type_3 <- var_5 %$% reorder.factor(cst_type, revenue_proportion, function(x) sum(x))
                         
@@ -117,9 +111,8 @@
                         coord_flip() +
                         geom_text(aes(label = percent(revenue_proportion)), size = 3, hjust = -0.2) +
                         mytheme
-                        
-            
-      
+
+                              
       # 6. Porcentaje de revenue broadband que por categoria de usuario
       var_6       <-    grp.v1 %>%
                         summarise(revenue = sum(revenue_inf)) %>%
@@ -137,11 +130,6 @@
                               coord_flip() +
                               geom_text(aes(label = percent(revenue_inf_proportion)), size = 3, hjust = -0.2) +
                               mytheme
-      
-      
-      
-      
-      
       
       
       # 7. Construir un df con los puntos anteriores
