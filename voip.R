@@ -9,7 +9,8 @@
                             'tidyverse',
                             'magrittr',    # operators like (%>%, %<>%, %$%)
                             'scales',      # percent_format
-                            'gdata')       # reorder.factor function
+                            'gdata',
+                            'stringr')       # reorder.factor function
       
       new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[, "Package"])]
       if(length(new.packages)) install.packages(new.packages)
@@ -228,7 +229,7 @@
 ##  ............................................................................
 ##  Guardar workspace                                                       ####
 
-      rm(var_1, pkgs, inst, new.packages, list.of.packages, grp.v1)
+      rm(var_1, pkgs, inst, new.packages, list.of.packages)
       save.image(file = 'workspace_ejercicio_1.RData')
             
             
