@@ -6,11 +6,11 @@
 ##  Step 0: Packages and options                                            ####
 
       list.of.packages <- c('data.table',  # funcion 'fread' lectura mas rapida que read_csv de readr
-                            'tidyverse',
+                            'tidyverse',   # dplyr
                             'magrittr',    # operators like (%>%, %<>%, %$%)
                             'scales',      # percent_format
-                            'gdata',
-                            'stringr')       # reorder.factor function
+                            'gdata',       # reorder.factor function
+                            'stringr')     # function str_replace_all
       
       new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[, "Package"])]
       if(length(new.packages)) install.packages(new.packages)
@@ -21,7 +21,7 @@
       
 
 ##  ............................................................................
-##  Step 1: Themes                                                          ####
+##  Step 1: Custom theme                                                    ####
 
       mytheme <- theme(panel.background = element_blank(),
                        panel.grid.major = element_blank(),
@@ -38,8 +38,8 @@
                                data.table = FALSE))
       
       # cargar rda una vez leido.
-      save('voip_users_raw_df.rda')
-      load('voip_users_raw_df.rda')
+      # save(var_1, file = 'voip_users_raw_df.rda')
+      # load('voip_users_raw_df.rda')
       
             
 ##  ............................................................................
@@ -63,7 +63,7 @@
                         count(cst_type, sort = TRUE) %>%
                         rename(users = n) %>%
                         mutate_at('cst_type', as.factor)
-                        
+      
                         # reordenar factores
                         type_1 <- var_3 %$% reorder.factor(cst_type, users, function(x) sum(x))
                   
