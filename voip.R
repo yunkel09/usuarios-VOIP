@@ -5,20 +5,19 @@
 ##  ............................................................................
 ##  Step 0: Packages and options                                            ####
 
-      list.of.packages <- c('data.table',  # funcion 'fread' lectura mas rapida que read_csv de readr
+      list.of.packages <- c('data.table',  # fread faster than readr::read_csv
                             'tidyverse',   # dplyr
-                            'magrittr',    # operators like (%>%, %<>%, %$%)
+                            'magrittr',    # operators (%>%, %<>%, %$%)
                             'scales',      # percent_format
-                            'gdata',       # reorder.factor function
-                            'stringr')     # function str_replace_all
+                            'gdata',       # reorder.factor
+                            'stringr')     # str_replace_all
       
       new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[, "Package"])]
       if(length(new.packages)) install.packages(new.packages)
       inst <- lapply(c(list.of.packages, new.packages), library, character.only = TRUE, quietly = TRUE)
 
       # definir opciones      
-      options(scipen = 999)                # Evitar notacion cientifica
-      
+      options(scipen = 999)                
 
 ##  ............................................................................
 ##  Step 1: Custom theme                                                    ####
@@ -33,13 +32,13 @@
 ##  ............................................................................
 ##  Step 2: Load Dataset                                                    ####
 
-      myurl <- 'http://talent.com.gt/IntroR/UsersVoIP.csv'
-      var_1 <- as.tibble(fread(input = myurl,
-                               data.table = FALSE))
+      # myurl <- 'http://talent.com.gt/IntroR/UsersVoIP.csv'
+      # var_1 <- as.tibble(fread(input = myurl,
+      #                          data.table = FALSE))
       
       # cargar rda una vez leido.
       # save(var_1, file = 'voip_users_raw_df.rda')
-      # load('voip_users_raw_df.rda')
+      load('voip_users_raw_df.rda')
       
             
 ##  ............................................................................
@@ -229,7 +228,7 @@
 ##  ............................................................................
 ##  Guardar workspace                                                       ####
 
-      rm(var_1, pkgs, inst, new.packages, list.of.packages)
+      rm(var_1, inst, new.packages, list.of.packages, grp.v1)
       save.image(file = 'workspace_ejercicio_1.RData')
             
             
